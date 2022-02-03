@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutter Quiz App</title>
+
+    <!-- bootstrap -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+        crossorigin="anonymous"></script>
+
+    <!-- external stylesheet -->
+
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- external JS -->
+    <script src="main.js" defer></script>
+
+
+
+</head>
+
+<body class="bg-warning">
+
+    <script>
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').trigger('focus')
+        })
+    </script>
+
+    <div class="container mb-5 mt-5">
+        <h1><strong> Code Along Your Own Quiz App</strong></h1>
+
+        <p>Follow the below steps to create your own quiz app </p>
+    </div>
+
+
+
+    <div class="container">
+        <p class="language" id="language-copy"><b>STEP 1 : </b> Create a file named main.dart and paste the following
+            code</p>
+        <div class="code-wrapper">
+            <pre>
+                    <code id="code">
+
+import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'quiz_brain.dart';
+
+QuizBrain quizBrain = QuizBrain();
+
+void main() => runApp(Quizzler());
+
+class Quizzler extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.grey.shade900,
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.0),
+            child: QuizPage(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class QuizPage extends StatefulWidget {
+  @override
+  _QuizPageState createState() => _QuizPageState();
+}
+
+class _QuizPageState extends State<QuizPage> {
+  List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+
+    setState(() {
+      if (quizBrain.isFinished() == true) {
+
+        Alert(
+          context: context,
+          title: 'Finished!',
+          desc: 'You\'ve reached the end of the quiz.',
+        ).show();
+
+        quizBrain.reset();
+
+        scoreKeeper = [];
+      }
+
+      else {
+        if (userPickedAnswer == correctAnswer) {
+          scoreKeeper.add(Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          scoreKeeper.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        quizBrain.nextQuestion();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Expanded(
+          flex: 5,
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Center(
+              child: Text(
+                quizBrain.getQuestionText(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 25.0,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.all(15.0),
+            child: FlatButton(
+              textColor: Colors.white,
+              color: Colors.green,
+              child: Text(
+                'True',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
+              ),
+              onPressed: () {
+                //The user picked true.
+                checkAnswer(true);
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.all(15.0),
+            child: FlatButton(
+              color: Colors.red,
+              child: Text(
+                'False',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                //The user picked false.
+                checkAnswer(false);
+              },
+            ),
+          ),
+        ),
+        Row(
+          children: scoreKeeper,
+        )
+      ],
+    );
+  }
+}
+
+
+    
+                    </code>
+                </pre>
+            <button id="copy-button">Copy</button>
+        </div>
+        <span id="copy-success">Code copied! :)</span>
+    </div>
+
+    <hr>
+
+    <div class="container">
+        <p class="language" id="language-copy"><b>STEP 2 : </b> Create a file named questions.dart and paste the
+            following code </p>
+        <div class="code-wrapper">
+            <pre>
+                    <code id="code">
+
+class Question {
+  String questionText;
+  bool questionAnswer;
+
+  Question(String q, bool a) {
+    questionText = q;
+    questionAnswer = a;
+  }
+}
+    
+                    </code>
+                </pre>
+            <button id="copy-button">Copy</button>
+        </div>
+        <span id="copy-success">Code copied! :)</span>
+    </div>
+
+    <hr>
+
+    <div class="container">
+        <p class="language" id="language-copy"><b>STEP 3 : </b> Create a file named quiz_brain.dart and paste the
+            following code </p>
+        <div class="code-wrapper">
+            <pre>
+                    <code id="code">
+
+import 'question.dart';
+
+class QuizBrain {
+  int _questionNumber = 0;
+
+  List<Question> _questionBank = [
+    Question('Some cats are actually allergic to humans', true),
+    Question('You can lead a cow down stairs but not up stairs.', false),
+    Question('Approximately one quarter of human bones are in the feet.', true),
+    Question('A slug\'s blood is green.', true),
+    Question('Buzz Aldrin\'s mother\'s maiden name was \"Moon\".', true),
+    Question('It is illegal to pee in the Ocean in Portugal.', true),
+    Question(
+        'No piece of square dry paper can be folded in half more than 7 times.',
+        false),
+    Question(
+        'In London, UK, if you happen to die in the House of Parliament, you are technically entitled to a state funeral, because the building is considered too sacred a place.',
+        true),
+    Question(
+        'The loudest sound produced by any animal is 188 decibels. That animal is the African Elephant.',
+        false),
+    Question(
+        'The total surface area of two human lungs is approximately 70 square metres.',
+        true),
+    Question('Google was originally called \"Backrub\".', true),
+    Question(
+        'Chocolate affects a dog\'s heart and nervous system; a few ounces are enough to kill a small dog.',
+        true),
+    Question(
+        'In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.',
+        true),
+  ];
+
+  void nextQuestion() {
+    if (_questionNumber < _questionBank.length - 1) {
+      _questionNumber++;
+    }
+  }
+
+  String getQuestionText() {
+    return _questionBank[_questionNumber].questionText;
+  }
+
+  bool getCorrectAnswer() {
+    return _questionBank[_questionNumber].questionAnswer;
+  }
+
+
+  bool isFinished() {
+    if (_questionNumber >= _questionBank.length - 1) {
+
+      print('Now returning true');
+      return true;
+
+    } else {
+      return false;
+    }
+  }
+
+  void reset() {
+    _questionNumber = 0;
+  }
+}
+
+    
+                    </code>
+                </pre>
+            <button id="copy-button">Copy</button>
+        </div>
+        <span id="copy-success">Code copied! :)</span>
+    </div>
+
+    <hr>
+
+    <div class="container justify-content-center text-center text-success">
+        <h3>Congrarulations🎉 ! You have Completed your app Sucessfully</h3>
+    </div>
+
+    <br><br>
+    <hr>
+
+</body>
+
+</html>

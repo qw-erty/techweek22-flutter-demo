@@ -27,6 +27,8 @@
 
     <!-- external JS -->
     <script src="main.js" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 
 
@@ -46,6 +48,11 @@
         <p>Follow the below steps to create your own quiz app </p>
     </div>
 
+    <script>
+      $('#myModal').on('shown.bs.modal', function () {
+          $('#myInput').trigger('focus')
+      })
+  </script>
 
 
     <div class="container">
@@ -54,22 +61,23 @@
         <div class="code-wrapper">
             <pre>
                     <code id="code">
-
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'quiz_brain.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
-void main() => runApp(Quizzler());
+void main() => runApp(const Quizzler());
 
 class Quizzler extends StatelessWidget {
+  const Quizzler({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.grey.shade900,
-        body: SafeArea(
+        body: const SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: QuizPage(),
@@ -81,19 +89,20 @@ class Quizzler extends StatelessWidget {
 }
 
 class QuizPage extends StatefulWidget {
+  const QuizPage({Key? key}) : super(key: key);
+
   @override
   _QuizPageState createState() => _QuizPageState();
 }
 
-class _QuizPageState extends State<QuizPage> {
-  List<Icon> scoreKeeper = [];
+class _QuizPageState extends State {
+  List<Widget> scoreKeeper = [];
 
   void checkAnswer(bool userPickedAnswer) {
     bool correctAnswer = quizBrain.getCorrectAnswer();
 
     setState(() {
       if (quizBrain.isFinished() == true) {
-
         Alert(
           context: context,
           title: 'Finished!',
@@ -103,16 +112,14 @@ class _QuizPageState extends State<QuizPage> {
         quizBrain.reset();
 
         scoreKeeper = [];
-      }
-
-      else {
+      } else {
         if (userPickedAnswer == correctAnswer) {
-          scoreKeeper.add(Icon(
+          scoreKeeper.add(const Icon(
             Icons.check,
             color: Colors.green,
           ));
         } else {
-          scoreKeeper.add(Icon(
+          scoreKeeper.add(const Icon(
             Icons.close,
             color: Colors.red,
           ));
@@ -127,16 +134,16 @@ class _QuizPageState extends State<QuizPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
+      children: [
         Expanded(
           flex: 5,
           child: Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
                 quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25.0,
                   color: Colors.white,
                 ),
@@ -146,30 +153,29 @@ class _QuizPageState extends State<QuizPage> {
         ),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.all(15.0),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: Colors.green,
-              child: Text(
+            padding: const EdgeInsets.all(15.0),
+            child: ElevatedButton(
+              child: const Text(
                 'True',
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 20.0,
+                  color: Colors.white,
                 ),
               ),
               onPressed: () {
-                //The user picked true.
+                //The user picked false.
                 checkAnswer(true);
               },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.green)),
             ),
           ),
         ),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.all(15.0),
-            child: FlatButton(
-              color: Colors.red,
-              child: Text(
+            padding: const EdgeInsets.all(15.0),
+            child: ElevatedButton(
+              child: const Text(
                 'False',
                 style: TextStyle(
                   fontSize: 20.0,
@@ -180,7 +186,16 @@ class _QuizPageState extends State<QuizPage> {
                 //The user picked false.
                 checkAnswer(false);
               },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.red)),
             ),
+
+            // FlatButton(
+            //   color: Colors.red,
+
+            //   ),
+
+            // ),
           ),
         ),
         Row(
@@ -201,6 +216,11 @@ class _QuizPageState extends State<QuizPage> {
     </div>
 
     <hr>
+    <script>
+      $('#myModal').on('shown.bs.modal', function () {
+          $('#myInput').trigger('focus')
+      })
+  </script>
 
     <div class="container">
         <p class="language" id="language-copy"><b>STEP 2 : </b> Create a file named questions.dart and paste the
@@ -210,14 +230,14 @@ class _QuizPageState extends State<QuizPage> {
                     <code id="code">
 
 class Question {
-  String questionText;
-  bool questionAnswer;
-
-  Question(String q, bool a) {
-    questionText = q;
-    questionAnswer = a;
-  }
+  Question(
+    this.questionText,
+    this.questionAnswer,
+  );
+  final String questionText;
+  final bool questionAnswer;
 }
+
     
                     </code>
                 </pre>
@@ -227,6 +247,11 @@ class Question {
     </div>
 
     <hr>
+    <script>
+      $('#myModal').on('shown.bs.modal', function () {
+          $('#myInput').trigger('focus')
+      })
+  </script>
 
     <div class="container">
         <p class="language" id="language-copy"><b>STEP 3 : </b> Create a file named quiz_brain.dart and paste the
@@ -235,12 +260,14 @@ class Question {
             <pre>
                     <code id="code">
 
-import 'question.dart';
+// ignore_for_file: prefer_final_fields, unnecessary_string_escapes , avoid_print
+
+import 'questions.dart';
 
 class QuizBrain {
   int _questionNumber = 0;
 
-  List<Question> _questionBank = [
+  List _questionBank = [
     Question('Some cats are actually allergic to humans', true),
     Question('You can lead a cow down stairs but not up stairs.', false),
     Question('Approximately one quarter of human bones are in the feet.', true),
@@ -282,13 +309,10 @@ class QuizBrain {
     return _questionBank[_questionNumber].questionAnswer;
   }
 
-
   bool isFinished() {
     if (_questionNumber >= _questionBank.length - 1) {
-
       print('Now returning true');
       return true;
-
     } else {
       return false;
     }
